@@ -63,8 +63,9 @@ int exp(void){
                     			break;
 
 		}
-		return temp;
+		
 	}
+	return temp;
 
 }
 
