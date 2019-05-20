@@ -11,32 +11,20 @@ node* fator(void);
 
 
 typedef struct _node_{
-	//int valor;
+	int valor;
 	char op;
 	struct _node_* filho_esquerdo;
 	struct _node_* filho_direito;
 }node;
 
 
-node* criar(char dado){
+node* criar(char op,int valor){
 	node* novo = (node*)malloc(sizeof(node));
 	if (novo == NULL) return NULL;
 
-	/**
-	if (isdigit(dado) == 0){ //se for 0 não é número
-		novo->op = dado;
-		//novo->valor = 0;// apenas para teste;
-		novo->filho_esquerdo = NULL;
-		novo->filho_direito = NULL;
-	}else{
-		//novo->op = 0;
-		novo->valor = dado;// apenas para teste;
-		novo->filho_esquerdo = NULL;
-		novo->filho_direito = NULL;]
-
-	}
-	*/
-	novo->op = dado;
+	
+	novo->valor = valor;
+	novo->op = op;
 	novo->filho_esquerdo = NULL;
 	novo->filho_direito = NULL;
 
