@@ -1,10 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "tree.c"
+
+typedef struct _tree_{
+    char *op;
+    int *val;
+    struct _tree_ *pai;
+    struct _tree_ *esq;
+    struct _tree_ *dir;
+} tree;
+
+tree *criar(char *op, int *val){
+    tree *novo = (tree *) malloc(sizeof(tree));
+    novo->op = op;
+    novo->val = val;
+    novo->dir = NULL;
+    novo->esq = NULL;
+    novo->pai = NULL;
+
+    return novo;
+}
 
 char token;
 
+double exp(void); //Realiza a operação da calculadora
+int term(void);
+int fator(void);
 tree *expressao(void);
 tree *termo(void);
 tree *fatorNew(void);
@@ -56,6 +77,16 @@ void printaTree(tree *a){
     }
 }
 
+/// CALCULADORA SINTÁTICA
+
+/*
+Casamaneto = chama getToken e pega o próximo
+Além de verificar a sintaxe ja faz o cálculo
+*/
+
+//Implementar uma calculadora para aritmética de inteiros simples segundo a EBNF
+
+
 
 void error(void){
   printf("Error\n");
@@ -85,6 +116,72 @@ int main(void) { //calculadora com árvore sintática
   return 0;
 }
 
+/*int main(void) { //calculadora normal
+  int resultado;
+  token = getchar(); //Carga de marca com primeiro caractere com verificação a frente
+
+  resultado = exp();
+
+  if (token == '\n'){ //teste final de linha
+    printf("Resultado: %d", resultado);
+  }else
+    error();//Caracteres indevidos na linha
+  
+  return 0;
+}*/
+
+double exp(void){
+  int temp = term();
+
+  while((token == '+')||(token == '-') ||(token == '/') ||(token =='%')){
+    switch(token){
+      case '+': match('+');
+          temp += term();
+          break;
+      case '-': match('-');
+          temp -= term();
+          break;
+    }
+  }
+  
+  return temp;
+}
+
+int factor(void){
+  int temp;
+
+  if (token == '('){
+    match ('(');
+    temp = exp();
+    match(')');
+  }else if (isdigit(token)){
+    ungetc(token,stdin);
+    scanf("%d", &temp);
+    token = getchar();
+  }else
+    error();
+    return temp;
+
+}
+
+int term(void){
+  int temp = factor();
+
+  while(token == '*' || token == '/' || token == '%'){
+    switch(token){
+      case '*': match('*');
+        temp *= factor();
+        break;
+      case '/': match('/');
+        temp /= term();
+        break;
+      case '%': match('%');
+        temp = temp%term();
+        break;
+    }
+  }
+  return temp;
+}
 
 tree *expressao(void){
   tree *novatemp, *temp;

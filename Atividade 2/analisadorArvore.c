@@ -1,7 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "tree.c"
+
+typedef struct _tree_{
+    char *operacao;
+    int *valores;
+    struct _tree_ *pai;
+    struct _tree_ *esq;
+    struct _tree_ *dir;
+} tree;
+
+tree *criar(char *operacao, int *valores){
+    tree *novo = (tree *) malloc(sizeof(tree));
+    novo->operacao = operacao;
+    novo->valores = valores;
+    novo->dir = NULL;
+    novo->esq = NULL;
+    novo->pai = NULL;
+
+    return novo;
+}
 
 char token;
 
@@ -44,10 +62,10 @@ void printaTree(tree *a){
       }
       
       printf("Raiz\n");
-      if(a->op != NULL)
-        printf("%c \n", (char) a->op);
+      if(a->operacao != NULL)
+        printf("%c \n", (char) a->operacao);
       else
-        printf("%d \n", (int) a->val);
+        printf("%d \n", (int) a->valores);
 
       if(a->dir != NULL){
         printf("Direita\n");
@@ -55,6 +73,16 @@ void printaTree(tree *a){
       }
     }
 }
+
+/// CALCULADORA SINTÁTICA
+
+/*
+Casamento = chama getToken e pega o próximo
+Além de verificar a sintaxe ja faz o cálculo
+*/
+
+//Implementar uma calculadora para aritmética de inteiros simples segundo a EBNF
+
 
 
 void error(void){
@@ -85,22 +113,21 @@ int main(void) { //calculadora com árvore sintática
   return 0;
 }
 
-
 tree *expressao(void){
   tree *novatemp, *temp;
-  char *op = NULL;
+  char *operacao = NULL;
   temp = termo();
   while(token == '+' || token == '-'){
     switch(token){
       case '+': match('+');
-        op = malloc(1);
-        op = (char *) '+';
-        novatemp = criar(op, NULL);
+        operacao = malloc(1);
+        operacao = (char *) '+';
+        novatemp = criar(operacao, NULL);
         break;
       case '-': match('-');
-        op = malloc(1);
-        op = (char *) '-';
-        novatemp = criar(op, NULL);
+        operacao = malloc(1);
+        operacao = (char *) '-';
+        novatemp = criar(operacao, NULL);
         break;
     }
     filhoEsq(novatemp, temp);
@@ -113,7 +140,7 @@ tree *expressao(void){
 
 tree *factorTree(void){
   tree *temp = NULL;
-  int val;
+  int valores;
 
   if (token == '('){
     match ('(');
@@ -121,8 +148,8 @@ tree *factorTree(void){
     match(')');
   }else if (isdigit(token)){
     ungetc(token,stdin);
-    scanf("%d", &val);
-    temp = criar(NULL, (int*) val);
+    scanf("%d", &valores);
+    temp = criar(NULL, (int*) valores);
     token = getchar();
   }else
     error();
@@ -132,25 +159,25 @@ tree *factorTree(void){
 
 tree *termo(void){
   tree *novatemp, *temp;
-  char *op = NULL;
+  char *operacao = NULL;
   temp = factorTree();
 
   while(token == '*' || token == '/' || token == '%'){
     switch(token){
       case '*': match('*');
-        op = malloc(1);
-        op = (char *) '*';
-        novatemp = criar(op, NULL);
+        operacao = malloc(1);
+        operacao = (char *) '*';
+        novatemp = criar(operacao, NULL);
         break;
       case '/': match('/');
-        op = malloc(1);
-        op = (char *) '/';
-        novatemp = criar(op, NULL);
+        operacao = malloc(1);
+        operacao = (char *) '/';
+        novatemp = criar(operacao, NULL);
         break;
       case '%': match('%');
-        op = malloc(1);
-        op = (char *) '%';
-        novatemp = criar(op, NULL);
+        operacao = malloc(1);
+        operacao = (char *) '%';
+        novatemp = criar(operacao, NULL);
         break;
     }
     filhoEsq(novatemp, temp);
@@ -167,14 +194,14 @@ int sum(tree *a){
   if(a->esq != NULL)
     resultado = sum(a->esq);
   
-  if(a->val != NULL)
-    resultado = (int) a->val;
+  if(a->valores != NULL)
+    resultado = (int) a->valores;
   else{
-    if(a->dir->op != NULL)
+    if(a->dir->operacao != NULL)
       aux = sum(a->dir);
     else
-      aux = (int) a->dir->val;
-    switch((char) a->op){
+      aux = (int) a->dir->valores;
+    switch((char) a->operacao){
       case '+':
         resultado+= aux;
         break;
